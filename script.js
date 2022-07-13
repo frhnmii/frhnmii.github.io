@@ -1,8 +1,8 @@
-function download(url, fileType, filename = 'screenshot') {
+function download(url, filename = 'screenshot') {
   const a = document.createElement('a');
   a.style.display = 'none';
   a.href = url;
-  a.download = `${filename}.${fileType.split('/')[1]}`;
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   window.URL.revokeObjectURL(url);
@@ -16,6 +16,7 @@ document.onpaste = function (pasteEvent) {
   const imgContainer = document.getElementById('container');
   const historyContainer = document.getElementById('history');
   const customName = document.getElementById('customName');
+  const textImgName = document.getElementById('textImgName');
 
   if (item.type.indexOf('image') === 0) {
     var blob = item.getAsFile();
@@ -26,6 +27,9 @@ document.onpaste = function (pasteEvent) {
       const filename = customName.value
         ? `${customName.value}_${dateNow}`
         : `screenshot_${dateNow}`;
+
+      const filenameWithFileType = `${filename}.${blob.type.split('/')[1]}`;
+
       const imgHistory = document.createElement('img');
       const br = document.createElement('br');
 
@@ -43,6 +47,8 @@ document.onpaste = function (pasteEvent) {
 
       imgHistory.addEventListener('click', () => {
         imgContainer.src = event.target.result;
+        textImgName.innerText = filenameWithFileType;
+
         imgContainer.scrollIntoView();
         if (imgBefore) {
           imgBefore.classList.remove('selectedImg');
@@ -51,10 +57,12 @@ document.onpaste = function (pasteEvent) {
         imgHistory.classList.add('selectedImg');
       });
 
+      textImgName.innerText = filenameWithFileType;
+
       historyContainer.appendChild(imgHistory);
       countItem += 1;
 
-      download(reader.result, blob.type, filename);
+      download(reader.result, filenameWithFileType);
     };
     reader.readAsDataURL(blob);
   }
